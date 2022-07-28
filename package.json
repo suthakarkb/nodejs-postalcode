@@ -1,0 +1,21 @@
+{
+    "name": "postalCode-node-api",
+    "version": "1.0.0",
+    "private": true,
+    "description": "postalCode Node API",
+    "main": "server.js",
+    "dependencies": {
+        "axios": "^0.21.1",
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "express": "^4.17.0",
+        "express-jwt": "^6.0.0",
+        "mysql2": "^2.1.0",
+        "randomatic": "^3.1.1"
+    },
+    "scripts": {
+        "start": "node server.js"
+    },
+    "author": "Suthakar Kumar Bose",
+    "license": "ISC"
+}
