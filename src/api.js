@@ -1,6 +1,7 @@
 const axios = require('axios')
 const express = require("express");
-const randomize = require('randomatic');
+const cheerio = require("cheerio");
+const fs = require("fs-extra");
 
 //API scope validation
 const router  = module.exports = express.Router();
@@ -56,3 +57,22 @@ router.get("/postalcode/sg/:postCd", function(req, res) {
         return
     });
 });
+
+
+
+router.get("/countrycodes", async function(req, res) {
+    const url = "https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3";
+	const { data } = await axios.get(url);
+	const $ = cheerio.load(data);
+	const listItems = $(".plainlist ul li");
+	let countries = [];
+	listItems.each((idx, el) => {
+      	   const country = { name: "", iso3: "" };
+      	   country.name = $(el).children("a").text();
+      	   country.iso3 = $(el).children("span").text();
+      	   countries.push(country);
+   	 });
+	console.dir(countries);
+	res.status(200).json(countries);
+   });
+
