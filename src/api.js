@@ -58,6 +58,64 @@ router.get("/postalcode/sg/:postCd", function(req, res) {
     });
 });
 
+/**
+ * @api {post} /postalcode/sg/search This API search singapore postal codes.
+ * @apiName postalCode Search
+ * @apiGroup api/postalcode/sg/search
+ *
+ * @apiParam {String} [Block Number]  Block Number
+ * @apiParam {String} [Street Name]  Street Name
+ *
+ */
+  router.get("/postalcode/sg/search/:street", async function(req, res) {
+    console.log("Searching Singapore postal code...");
+    //console.log(JSON.stringify(req.body));
+    var validInput = true;
+    var message = "";
+    //Validations for postal code search
+   if (req.params.street == undefined || req.params.street.trim() == ""){
+     validInput = false;
+     message = "Street is required";
+   }
+   if (!validInput){
+      console.log("Street Name not valid");
+      res.status(400).json({success: false,"message": message});
+      return;
+   }
+
+   let street = req.params.street;
+   console.log('Validation Success  = ', street);
+   let addressList = [];
+   let mapurl = "https://developers.onemap.sg/commonapi/search?searchVal="+street+"&returnGeom=Y&getAddrDetails=Y&pageNum=1";
+   axios.get(mapurl).then(resp => {
+        console.log(resp.data);
+        if(resp.data.results.length > 0) {
+	   for(var i=0; i<resp.data.results.length; i++) {
+		let address = {};
+          	address.Building = resp.data.results[i].SEARCHVAL;
+          	address.BlockNo = resp.data.results[i].BLK_NO;
+          	address.RoadName = resp.data.results[i].ROAD_NAME;
+          	address.Address = resp.data.results[i].ADDRESS;
+          	address.PostalCode = resp.data.results[i].POSTAL;
+          	address.Geo_X = resp.data.results[i].X;
+          	address.Geo_Y = resp.data.results[i].Y;
+          	address.Latitude = resp.data.results[i].LATITUDE;
+          	address.Longitude = resp.data.results[i].LONGITUDE;
+		addressList.push(address);
+	   }
+          res.status(200).json({success: true,"addressList": addressList});
+          return
+        } else {
+          res.status(500).json({success: false,"message": "Not found"});
+          return
+        }
+    }).catch(error => {
+        console.log(error);
+        res.status(500).json({success: false,"message": "Not found"});
+        return
+    });
+});
+
 
 
 router.get("/countrycodes", async function(req, res) {
